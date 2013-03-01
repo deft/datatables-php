@@ -1,0 +1,23 @@
+{
+    "name": "deft/datatables-php",
+    "authors": [
+        {
+            "name": "Jan Kramer",
+            "email": "jan@deft.nl"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {
+        "symfony/http-foundation": "~2.0"
+    },
+    "autoload": {
+        "psr-0": {
+            "Deft\\DataTables": "src/"
+        }
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "0.1-dev"
+        }
+    }
+}
