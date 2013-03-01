@@ -9,6 +9,7 @@
          stopOnFailure="false"
          syntaxCheck="false"
          bootstrap="tests/bootstrap.php"
+         colors="true"
         >
 
     <testsuites>

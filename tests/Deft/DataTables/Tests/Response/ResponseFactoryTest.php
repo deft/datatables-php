@@ -1,7 +1,6 @@
 <?php
 namespace Deft\DataTables\Tests\Response;
 
-use Deft\DataTables\DataSource\ArrayDataSource;
 use Deft\DataTables\DataSource\DataSourceInterface;
 use Deft\DataTables\Request\Request;
 use Deft\DataTables\Response\ResponseFactory;
@@ -40,7 +39,7 @@ class ResponseFactoryTest extends \PHPUnit_Framework_TestCase
 
         $this->dataSourceStub
             ->expects($this->any())
-            ->method('getData')
+            ->method('getDisplayData')
             ->will($this->returnValue($this->data))
         ;
     }
@@ -54,9 +53,9 @@ class ResponseFactoryTest extends \PHPUnit_Framework_TestCase
 
         $response = $this->responseFactory->createResponse($request, $this->dataSourceStub);
 
-        $this->assertEquals(2, $response->echo);
-        $this->assertEquals(10, $response->totalNumberOfRecords);
-        $this->assertEquals(2, $response->numberOfFilteredRecords);
-        $this->assertEquals($this->data, $response->data);
+        $this->assertEquals(2, $response->sEcho);
+        $this->assertEquals(10, $response->iTotalRecords);
+        $this->assertEquals(2, $response->iTotalDisplayRecords);
+        $this->assertEquals($this->data, $response->aaData);
     }
 }

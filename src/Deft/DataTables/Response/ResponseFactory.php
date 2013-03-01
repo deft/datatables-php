@@ -15,10 +15,10 @@ class ResponseFactory
     public function createResponse(Request $request, DataSourceInterface $dataSource)
     {
         $response = new Response;
-        $response->echo = $request->echo;
-        $response->totalNumberOfRecords = $dataSource->getTotalNumberOfRecords();
-        $response->numberOfFilteredRecords = $dataSource->getNumberOfFilteredRecords($request);
-        $response->data = $dataSource->getData($request);
+        $response->sEcho = $request->echo;
+        $response->iTotalRecords = $dataSource->getTotalNumberOfRecords();
+        $response->iTotalDisplayRecords = $dataSource->getNumberOfFilteredRecords($request);
+        $response->aaData = $dataSource->getDisplayData($request);
 
         return $response;
     }
