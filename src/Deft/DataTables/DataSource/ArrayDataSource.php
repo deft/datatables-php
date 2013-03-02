@@ -55,17 +55,17 @@ class ArrayDataSource implements DataSourceInterface
     protected function filterData(Request $request, $data)
     {
         if (count($request->columnFilters) == 0) return $data;
+        return array_filter(
+            $data,
+            function ($row) use ($request) {
+                $filterResults = [];
+                array_walk($request->columnFilters, function ($filter, $column) use ($row, &$filterResults) {
+                    $filterResults[] = false !== strpos($row[$column], $filter);
+                });
 
-        foreach ($data as $i => $row) {
-            $filterResults = [];
-            foreach ($request->columnFilters as $column => $filter) {
-                $filterResults[] = false !== strpos($row[$column], $filter);
+                return in_array(true, $filterResults);
             }
-            if (in_array(true, $filterResults)) continue;
-            unset($data[$i]);
-        }
-
-        return $data;
+        );
     }
 
     protected function sortData(Request $request, $data)
