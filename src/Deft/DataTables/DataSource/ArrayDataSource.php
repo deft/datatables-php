@@ -63,7 +63,7 @@ class ArrayDataSource implements DataSourceInterface
                     $filterResults[] = false !== strpos($row[$column], $filter);
                 });
 
-                return in_array(true, $filterResults);
+                return !in_array(false, $filterResults);
             }
         );
     }
