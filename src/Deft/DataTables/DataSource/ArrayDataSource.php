@@ -73,7 +73,7 @@ class ArrayDataSource implements DataSourceInterface
         $sorts = $request->columnSorts;
         if (count($sorts) == 0) return $data;
 
-        uasort($data, function ($a, $b) use ($sorts) {
+        usort($data, function ($a, $b) use ($sorts) {
             foreach ($sorts as $column => $direction) {
                 if ($a[$column] == $b[$column]) continue;
                 $result = $a[$column] < $b[$column] ? -1 : 1;
@@ -81,7 +81,7 @@ class ArrayDataSource implements DataSourceInterface
                 return $direction == 'asc' ? $result : $result * -1;
             }
 
-            return 0;
+            return 1;
         });
 
         return $data;

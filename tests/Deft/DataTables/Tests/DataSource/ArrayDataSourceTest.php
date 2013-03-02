@@ -23,6 +23,18 @@ class ArrayDataSourceTest extends \PHPUnit_Framework_TestCase
         $this->dataSource = new ArrayDataSource($this->data);
     }
 
+    public function testCreateDataSet_paginate()
+    {
+        $request = $this->getBaseRequest();
+        $request->displayLength = 1;
+        $request->displayStart = 1;
+
+        $expectedData = [['col1' => 'bar', 'col2' => 'foo']];
+
+        $dataSet = $this->dataSource->createDataSet($request);
+        $this->assertEquals($expectedData, $dataSet->data);
+    }
+
     public function testCreateDataSet_sort()
     {
         $request = $this->getBaseRequest();
@@ -34,8 +46,7 @@ class ArrayDataSourceTest extends \PHPUnit_Framework_TestCase
             ['col1' => 'bar', 'col2' => 'foo']
         ];
 
-        $dataSet = $this->dataSource->createDataSet($request);
-        $this->assertEquals($expectedData, $dataSet->data);
+        $this->assertExpectedData($request, $expectedData);
     }
 
     public function testCreateDataSet_multiSort()
@@ -50,8 +61,20 @@ class ArrayDataSourceTest extends \PHPUnit_Framework_TestCase
             ['col1' => 'foo', 'col2' => 'bar']
         ];
 
-        $dataSet = $this->dataSource->createDataSet($request);
-        $this->assertEquals($expectedData, $dataSet->data);
+        $this->assertExpectedData($request, $expectedData);
+    }
+
+    public function testCreateDataSet_sortNoEffect()
+    {
+        $request = $this->getBaseRequest();
+        $request->columnFilters['col1'] = 'foo';
+        $request->columnSorts['col1'] = 'asc';
+
+        $expectedData = [
+            $this->data[0],
+            $this->data[2]
+        ];
+        $this->assertExpectedData($request, $expectedData);
     }
 
     public function testCreateDataSet_filters()
@@ -64,6 +87,15 @@ class ArrayDataSourceTest extends \PHPUnit_Framework_TestCase
             ['col1' => 'foo', 'col2' => 'barfoo']
         ];
 
+        $this->assertExpectedData($request, $expectedData);
+    }
+
+    /**
+     * @param $request
+     * @param $expectedData
+     */
+    protected function assertExpectedData($request, $expectedData)
+    {
         $dataSet = $this->dataSource->createDataSet($request);
         $this->assertEquals($expectedData, $dataSet->data);
     }
