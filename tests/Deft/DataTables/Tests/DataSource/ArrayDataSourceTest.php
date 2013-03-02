@@ -33,6 +33,8 @@ class ArrayDataSourceTest extends \PHPUnit_Framework_TestCase
 
         $dataSet = $this->dataSource->createDataSet($request);
         $this->assertEquals($expectedData, $dataSet->data);
+        $this->assertEquals(3, $dataSet->numberOfTotalRecords);
+        $this->assertEquals(3, $dataSet->numberOfFilteredRecords);
     }
 
     public function testCreateDataSet_sort()
@@ -87,7 +89,10 @@ class ArrayDataSourceTest extends \PHPUnit_Framework_TestCase
             ['col1' => 'foo', 'col2' => 'barfoo']
         ];
 
-        $this->assertExpectedData($request, $expectedData);
+        $dataSet = $this->dataSource->createDataSet($request);
+        $this->assertEquals($expectedData, $dataSet->data);
+        $this->assertEquals(3, $dataSet->numberOfTotalRecords);
+        $this->assertEquals(2, $dataSet->numberOfFilteredRecords);
     }
 
     /**
