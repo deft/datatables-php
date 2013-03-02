@@ -5,7 +5,7 @@ namespace Deft\DataTables\Response;
 use Deft\DataTables\DataSource\DataSet;
 use Deft\DataTables\Request\Request;
 
-class ResponseFactory
+class ResponseFactory implements ResponseFactoryInterface
 {
     /**
      * @param  \Deft\DataTables\Request\Request    $request
