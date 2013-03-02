@@ -23,30 +23,7 @@ class ArrayDataSourceTest extends \PHPUnit_Framework_TestCase
         $this->dataSource = new ArrayDataSource($this->data);
     }
 
-    public function testGetTotalNumberOfRecords()
-    {
-        $this->assertEquals(3, $this->dataSource->getTotalNumberOfRecords());
-    }
-
-    public function testGetNumberOfFilteredRecords()
-    {
-        $request = $this->getBaseRequest();
-        $request->columnFilters['col1'] = 'foo';
-
-        $this->dataSource->setRequest($request);
-        $this->assertEquals(2, $this->dataSource->getNumberOfFilteredRecords($request));
-    }
-
-    public function testGetData()
-    {
-        $this->dataSource->setRequest($this->getBaseRequest());
-        $this->assertEquals(
-            $this->data,
-            $this->dataSource->getDisplayData()
-        );
-    }
-
-    public function testGetData_sort()
+    public function testCreateDataSet_sort()
     {
         $request = $this->getBaseRequest();
         $request->columnSorts['col2'] = 'asc';
@@ -57,11 +34,11 @@ class ArrayDataSourceTest extends \PHPUnit_Framework_TestCase
             ['col1' => 'bar', 'col2' => 'foo']
         ];
 
-        $this->dataSource->setRequest($request);
-        $this->assertEquals($expectedData, $this->dataSource->getDisplayData());
+        $dataSet = $this->dataSource->createDataSet($request);
+        $this->assertEquals($expectedData, $dataSet->data);
     }
 
-    public function testGetData_multiSort()
+    public function testCreateDataSet_multiSort()
     {
         $request = $this->getBaseRequest();
         $request->columnSorts['col1'] = 'asc';
@@ -73,11 +50,11 @@ class ArrayDataSourceTest extends \PHPUnit_Framework_TestCase
             ['col1' => 'foo', 'col2' => 'bar']
         ];
 
-        $this->dataSource->setRequest($request);
-        $this->assertEquals($expectedData, $this->dataSource->getDisplayData());
+        $dataSet = $this->dataSource->createDataSet($request);
+        $this->assertEquals($expectedData, $dataSet->data);
     }
 
-    public function testGetData_filters()
+    public function testCreateDataSet_filters()
     {
         $request = $this->getBaseRequest();
         $request->columnFilters['col1'] = 'foo';
@@ -87,8 +64,8 @@ class ArrayDataSourceTest extends \PHPUnit_Framework_TestCase
             ['col1' => 'foo', 'col2' => 'barfoo']
         ];
 
-        $this->dataSource->setRequest($request);
-        $this->assertEquals($expectedData, $this->dataSource->getDisplayData());
+        $dataSet = $this->dataSource->createDataSet($request);
+        $this->assertEquals($expectedData, $dataSet->data);
     }
 
     /**

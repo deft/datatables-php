@@ -31,58 +31,49 @@ class ArrayDataSource implements DataSourceInterface
         $this->data = $data;
     }
 
-    /**
-     * @param \Deft\DataTables\Request\Request $request
-     */
-    public function setRequest(Request $request)
+    public function createDataSet(Request $request)
     {
-        $this->request = $request;
+        $displayData = $this->sortData(
+            $request,
+            $this->filterData($request, $this->data)
+        );
+
+        $dataSet = new DataSet();
+        $dataSet->numberOfTotalRecords = count($this->data);
+        $dataSet->numberOfFilteredRecords = count($displayData);
+        $dataSet->data = array_values(
+            array_slice(
+                $displayData,
+                $request->displayStart,
+                $request->displayLength
+            )
+        );
+
+        return $dataSet;
     }
 
-    /**
-     * @return int
-     */
-    public function getTotalNumberOfRecords()
+    protected function filterData(Request $request, $data)
     {
-        return count($this->data);
-    }
+        if (count($request->columnFilters) == 0) return $data;
 
-    /**
-     * @return int
-     */
-    public function getNumberOfFilteredRecords()
-    {
-        return count($this->getDisplayData());
-    }
-
-    /**
-     * @return array
-     */
-    public function getDisplayData()
-    {
-        if (!$this->displayData) {
-            $this->displayData = $this->createDisplayData();
-        }
-
-        return array_values($this->displayData);
-    }
-
-    protected function createDisplayData()
-    {
-        $displayData = [];
-
-        foreach ($this->data as $row) {
+        foreach ($data as $i => $row) {
             $filterResults = [];
-            foreach ($this->request->columnFilters as $column => $filter) {
+            foreach ($request->columnFilters as $column => $filter) {
                 $filterResults[] = false !== strpos($row[$column], $filter);
             }
-            if (in_array(true, $filterResults) || count($this->request->columnFilters) == 0) $displayData[] = $row;
+            if (in_array(true, $filterResults)) continue;
+            unset($data[$i]);
         }
 
-        $sorts = $this->request->columnSorts;
-        if (count($sorts) == 0) return array_values($displayData);
+        return $data;
+    }
 
-        uasort($displayData, function ($a, $b) use ($sorts) {
+    protected function sortData(Request $request, $data)
+    {
+        $sorts = $request->columnSorts;
+        if (count($sorts) == 0) return $data;
+
+        uasort($data, function ($a, $b) use ($sorts) {
             foreach ($sorts as $column => $direction) {
                 if ($a[$column] == $b[$column]) continue;
                 $result = $a[$column] < $b[$column] ? -1 : 1;
@@ -93,6 +84,6 @@ class ArrayDataSource implements DataSourceInterface
             return 0;
         });
 
-        return array_values($displayData);
+        return $data;
     }
 }

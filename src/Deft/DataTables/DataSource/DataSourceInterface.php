@@ -6,8 +6,9 @@ use Deft\DataTables\Request\Request;
 
 interface DataSourceInterface
 {
-    public function setRequest(Request $request);
-    public function getTotalNumberOfRecords();
-    public function getNumberOfFilteredRecords();
-    public function getDisplayData();
+    /**
+     * @param \Deft\DataTables\Request\Request $request
+     * @return
+     */
+    public function createDataSet(Request $request);
 }
