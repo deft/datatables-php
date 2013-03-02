@@ -1,4 +1,5 @@
 <?php
+
 namespace Deft\DataTables\Tests\Response;
 
 use Deft\DataTables\DataSource\DataSet;

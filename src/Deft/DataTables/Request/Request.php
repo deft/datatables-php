@@ -1,4 +1,5 @@
 <?php
+
 namespace Deft\DataTables\Request;
 
 class Request

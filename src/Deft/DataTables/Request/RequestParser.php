@@ -1,4 +1,5 @@
 <?php
+
 namespace Deft\DataTables\Request;
 
 use Symfony\Component\HttpFoundation\ParameterBag;

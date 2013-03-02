@@ -1,4 +1,5 @@
 <?php
+
 namespace Deft\DataTables\Tests\Request;
 
 use Deft\DataTables\Request\RequestParser;
