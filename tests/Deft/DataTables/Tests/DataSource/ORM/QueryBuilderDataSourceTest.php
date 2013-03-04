@@ -83,7 +83,7 @@ class QueryBuilderDataSourceTest extends \PHPUnit_Framework_TestCase
         $where = $this->qb->getDQLPart('where')->getParts()[0];
         $this->assertEquals('p.name', $where->getLeftExpr());
         $this->assertEquals('LIKE', $where->getOperator());
-        $this->assertEquals('%test%', $this->qb->getParameter('0')->getValue());
+        $this->assertEquals('%test%', $this->qb->getParameter(0)->getValue());
     }
 
     public function testCreateDataSet_nullObject()

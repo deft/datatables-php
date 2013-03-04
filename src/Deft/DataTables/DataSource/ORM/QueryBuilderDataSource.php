@@ -45,8 +45,8 @@ class QueryBuilderDataSource implements DataSourceInterface
         $where = [];
         $params = [];
         foreach ($request->columnFilters as $column => $filter) {
-            $where[] = $this->qb->expr()->like($this->columnMapping[$column], ":{$column}");
-            $params[$column] = "%$filter%";
+            $params[count($where)] = "%$filter%";
+            $where[] = $this->qb->expr()->like($this->columnMapping[$column], '?' . count($where));
         }
         if (count($where) > 0) {
             $this->qb->where(call_user_func_array([$this->qb->expr(), 'andX'], $where));
