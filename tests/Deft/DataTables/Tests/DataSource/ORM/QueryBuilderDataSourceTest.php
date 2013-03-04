@@ -32,18 +32,7 @@ class QueryBuilderDataSourceTest extends \PHPUnit_Framework_TestCase
         $this->qb = $em->createQueryBuilder()
             ->select('p.name, p.price, c.name')
             ->from('Product', 'p')
-        ;
-        $this->dataSource = $this->getMock(
-            'Deft\DataTables\DataSource\ORM\QueryBuilderDataSource',
-            ['createPaginator'],
-            [$this->qb, [0 => 'p.name', 1 => 'p.price']]
-        );
-
-        $paginatorMock = $this->getMock('Doctrine\ORM\Tools\Pagination\Paginator', [], [$this->qb]);
-        $paginatorMock
-            ->expects($this->any())
-            ->method('count')
-            ->will($this->returnValue(10))
+            ->join('p.category', 'c')
         ;
 
         $this->testObject = new \StdClass;
@@ -52,17 +41,7 @@ class QueryBuilderDataSourceTest extends \PHPUnit_Framework_TestCase
         $this->testObject->category = new \StdClass;
         $this->testObject->category->name = 'foo';
 
-        $paginatorMock
-            ->expects($this->any())
-            ->method('getIterator')
-            ->will($this->returnValue([$this->testObject]))
-        ;
-
-        $this->dataSource
-            ->expects($this->any())
-            ->method('createPaginator')
-            ->will($this->returnValue($paginatorMock))
-        ;
+        $this->dataSource = $this->createDataSourceMock([0 => 'p.name', 1 => 'p.price'], [$this->testObject]);
     }
 
     public function testCreateDataSet_simple()
@@ -107,6 +86,18 @@ class QueryBuilderDataSourceTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('%test%', $this->qb->getParameter('0')->getValue());
     }
 
+    public function testCreateDataSet_nullObject()
+    {
+        $object = new \StdClass;
+        $object->name = 'Ghello';
+        $object->category = null;
+        $dataSource = $this->createDataSourceMock([0 => 'p.name', 1 => 'c.name'], [$object]);
+        $dataSet = $dataSource->createDataSet($this->getBaseRequest());
+
+        $this->assertEquals('Ghello', $dataSet->data[0][0]);
+        $this->assertEmpty($dataSet->data[0][1]);
+    }
+
     /**
      * @return \Deft\DataTables\Request\Request
      */
@@ -117,5 +108,35 @@ class QueryBuilderDataSourceTest extends \PHPUnit_Framework_TestCase
         $request->displayLength = 10;
 
         return $request;
+    }
+
+    protected function createDataSourceMock($columnMapping, $resultSet)
+    {
+        $dataSource = $this->getMock(
+            'Deft\DataTables\DataSource\ORM\QueryBuilderDataSource',
+            ['createPaginator'],
+            [$this->qb, $columnMapping]
+        );
+
+        $paginatorMock = $this->getMock('Doctrine\ORM\Tools\Pagination\Paginator', [], [$this->qb]);
+        $paginatorMock
+            ->expects($this->any())
+            ->method('count')
+            ->will($this->returnValue(10))
+        ;
+
+        $paginatorMock
+            ->expects($this->any())
+            ->method('getIterator')
+            ->will($this->returnValue($resultSet))
+        ;
+
+        $dataSource
+            ->expects($this->any())
+            ->method('createPaginator')
+            ->will($this->returnValue($paginatorMock))
+        ;
+
+        return $dataSource;
     }
 }

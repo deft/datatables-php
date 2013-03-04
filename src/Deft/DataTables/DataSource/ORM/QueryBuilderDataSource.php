@@ -7,6 +7,7 @@ use Deft\DataTables\DataSource\DataSourceInterface;
 use Deft\DataTables\Request\Request;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator;
+use Symfony\Component\PropertyAccess\Exception\UnexpectedTypeException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
 class QueryBuilderDataSource implements DataSourceInterface
@@ -78,7 +79,11 @@ class QueryBuilderDataSource implements DataSourceInterface
     {
         $row = [];
         foreach ($this->columnMapping as $column => $field) {
-            $row[$column] = PropertyAccess::getPropertyAccessor()->getValue($item, $propertyPathMapping[$column]);
+            try {
+                $row[$column] = PropertyAccess::getPropertyAccessor()->getValue($item, $propertyPathMapping[$column]);
+            } catch (UnexpectedTypeException $e) {
+                $row[$column] = null;
+            }
         }
 
         return $row;
