@@ -43,14 +43,14 @@ class QueryBuilderDataSource implements DataSourceInterface
 
         // Add filters
         $where = [];
-        $params = [];
         foreach ($request->columnFilters as $column => $filter) {
-            $params[count($where)] = "%$filter%";
-            $where[] = $this->qb->expr()->like($this->columnMapping[$column], '?' . count($where));
+            $paramName = ':datatables_' . count($where);
+            $where[] = $this->qb->expr()->like($this->columnMapping[$column], $paramName);
+            $this->qb->setParameter($paramName, "%$filter%");
         }
+
         if (count($where) > 0) {
-            $this->qb->where(call_user_func_array([$this->qb->expr(), 'andX'], $where));
-            $this->qb->setParameters($params);
+            $this->qb->andWhere(call_user_func_array([$this->qb->expr(), 'andX'], $where));
         }
 
         // Add sorting

@@ -80,10 +80,22 @@ class QueryBuilderDataSourceTest extends \PHPUnit_Framework_TestCase
         $request->columnFilters[0] = 'test';
         $dataSet = $this->dataSource->createDataSet($request);
 
-        $where = $this->qb->getDQLPart('where')->getParts()[0];
+        $where = $this->qb->getDQLPart('where')->getParts()[0]->getParts()[0];
         $this->assertEquals('p.name', $where->getLeftExpr());
         $this->assertEquals('LIKE', $where->getOperator());
-        $this->assertEquals('%test%', $this->qb->getParameter(0)->getValue());
+        $this->assertEquals('%test%', $this->qb->getParameters()->first()->getValue());
+    }
+
+    public function testCreateDataSet_conflictingFilters()
+    {
+        $request = $this->getBaseRequest();
+        $this->qb->andWhere('p.id = ?0')->setParameter(0, 'Test');
+        $request->columnFilters[0] = 'test';
+        $dataSet = $this->dataSource->createDataSet($request);
+
+        $where = $this->qb->getDQLPart('where')->getParts();
+        $this->assertCount(2, $where);
+        $this->assertCount(2, $this->qb->getParameters());
     }
 
     public function testCreateDataSet_nullObject()
