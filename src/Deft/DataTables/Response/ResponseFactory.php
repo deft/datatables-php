@@ -8,8 +8,8 @@ use Deft\DataTables\Request\Request;
 class ResponseFactory implements ResponseFactoryInterface
 {
     /**
-     * @param  \Deft\DataTables\Request\Request    $request
-     * @param  \Deft\DataTables\DataSource\DataSet $dataSet
+     * @param  Request  $request
+     * @param  DataSet  $dataSet
      * @return Response
      */
     public function createResponse(Request $request, DataSet $dataSet)

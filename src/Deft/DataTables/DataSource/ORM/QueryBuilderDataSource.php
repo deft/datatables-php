@@ -31,8 +31,8 @@ class QueryBuilderDataSource implements DataSourceInterface
     }
 
     /**
-     * @param \Deft\DataTables\Request\Request $request
-     * @return
+     * @param  Request $request
+     * @return DataSet
      */
     public function createDataSet(Request $request)
     {

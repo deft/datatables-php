@@ -15,7 +15,7 @@ class DataSet
     public $numberOfFilteredRecords;
 
     /**
-     * @var array
+     * @var array[]
      */
-    public $data;
+    public $data = [];
 }

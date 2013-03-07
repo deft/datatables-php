@@ -27,23 +27,31 @@ class Server implements ServerInterface
      */
     protected $dataSource;
 
-    public static function create(DataSourceInterface $dataSource)
+    /**
+     * @var DataTransformer\DataTransformerInterface[]
+     */
+    protected $dataTransformers;
+
+    public static function create(DataSourceInterface $dataSource, array $dataTransformers = [])
     {
         return new self(
             new RequestParser(),
             new ResponseFactory(),
-            $dataSource
+            $dataSource,
+            $dataTransformers
         );
     }
 
     public function __construct(
         RequestParserInterface $requestParser,
         ResponseFactoryInterface $responseFactory,
-        DataSourceInterface $dataSource
+        DataSourceInterface $dataSource,
+        array $dataTransformers = []
     ) {
         $this->requestParser = $requestParser;
         $this->responseFactory = $responseFactory;
         $this->dataSource = $dataSource;
+        $this->dataTransformers = $dataTransformers;
     }
 
     /**
@@ -57,9 +65,26 @@ class Server implements ServerInterface
         $dtRequest = $this->requestParser->parseRequest($httpRequest);
         $dataSet = $this->dataSource->createDataSet($dtRequest);
 
+        foreach ($dataSet->data as &$row) {
+            $this->applyDataTransformers($row);
+        }
+
         return $this->responseFactory
             ->createResponse($dtRequest, $dataSet)
             ->createHttpResponse()
         ;
+    }
+
+    /**
+     * @param  array $row
+     * @return array
+     */
+    protected function applyDataTransformers(array &$row)
+    {
+        foreach ($this->dataTransformers as $column => $dataTransformer) {
+            $row[$column] = $dataTransformer->transform($row[$column]);
+        }
+
+        return $row;
     }
 }

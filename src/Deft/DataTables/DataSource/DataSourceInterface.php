@@ -2,13 +2,14 @@
 
 namespace Deft\DataTables\DataSource;
 
+use Deft\DataTables\DataSource\DataSet;
 use Deft\DataTables\Request\Request;
 
 interface DataSourceInterface
 {
     /**
-     * @param \Deft\DataTables\Request\Request $request
-     * @return
+     * @param  Request $request
+     * @return DataSet
      */
     public function createDataSet(Request $request);
 }
