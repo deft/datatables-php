@@ -18,16 +18,24 @@ class QueryBuilderDataSource implements DataSourceInterface
     protected $qb;
 
     /**
-     * Maps datatables columns to query columns
+     * Maps datatables columns to fields in the DQL query
      *
      * @var array
      */
     protected $columnMapping;
 
-    public function __construct(QueryBuilder $qb, array $columnMapping)
+    /**
+     * Maps datatables columns to property paths in the object graph, relative to the selected root.
+     *
+     * @var array
+     */
+    protected $propertyPathMapping;
+
+    public function __construct(QueryBuilder $qb, array $columnMapping, array $propertyPathMapping = [])
     {
         $this->qb = $qb;
         $this->columnMapping = $columnMapping;
+        $this->propertyPathMapping = $propertyPathMapping;
     }
 
     /**
@@ -44,8 +52,18 @@ class QueryBuilderDataSource implements DataSourceInterface
         // Add filters
         $where = [];
         foreach ($request->columnFilters as $column => $filter) {
+            $fieldName = $this->columnMapping[$column];
+
+            /**
+             * @todo refactor handling of composite/aggregate fields
+             */
+            if (count(explode(".", $fieldName)) == 1) {
+                $fieldName = $this->retrieveExpressionByFieldName($fieldName);
+            }
+
+
             $paramName = ':datatables_' . count($where);
-            $where[] = $this->qb->expr()->like($this->columnMapping[$column], $paramName);
+            $where[] = $this->qb->expr()->like($fieldName, $paramName);
             $this->qb->setParameter($paramName, "%$filter%");
         }
 
@@ -66,7 +84,7 @@ class QueryBuilderDataSource implements DataSourceInterface
         $dataSet->data = [];
 
         $propertyPathMappingFactory = new PropertyPathMappingFactory();
-        $propertyPathMapping = $propertyPathMappingFactory->createPropertyPathMapping($this->qb, $this->columnMapping);
+        $propertyPathMapping = $propertyPathMappingFactory->createPropertyPathMapping($this->qb, $this->columnMapping, $this->propertyPathMapping);
 
         foreach ($paginatorFiltered->getIterator() as $item) {
             $dataSet->data[] = $this->buildRow($item, $propertyPathMapping);
@@ -92,5 +110,22 @@ class QueryBuilderDataSource implements DataSourceInterface
     public function createPaginator()
     {
         return new Paginator($this->qb);
+    }
+
+    private function retrieveExpressionByFieldName($fieldName)
+    {
+        /** @var $selectPart \Doctrine\ORM\Query\Expr\Select */
+        foreach ($this->qb->getDqlPart('select') as $selectPart)
+        {
+            foreach ($selectPart->getParts() as $part)
+            {
+                $pattern = "/^(.+) AS (?:|HIDDEN ){$fieldName}$/i";
+                if (preg_match($pattern, $part, $matches)) {
+                    return $matches[1];
+                }
+            }
+        }
+
+        throw new \InvalidArgumentException("Expression for field '$fieldName' could not be determined.");
     }
 }
