@@ -7,6 +7,7 @@ use Deft\DataTables\Request\RequestParser;
 use Deft\DataTables\Request\RequestParserInterface;
 use Deft\DataTables\Response\ResponseFactory;
 use Deft\DataTables\Response\ResponseFactoryInterface;
+use Deft\DataTables\Table\TableInterface;
 use Symfony\Component\HttpFoundation\Request as HttpRequest;
 use Symfony\Component\HttpFoundation\Response as HttpResponse;
 
@@ -40,6 +41,11 @@ class Server implements ServerInterface
             $dataSource,
             $dataTransformers
         );
+    }
+
+    public static function createFromTable(TableInterface $table)
+    {
+        return self::create($table->getDataSource(), $table->getDataTransformers());
     }
 
     public function __construct(
