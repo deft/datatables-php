@@ -21,7 +21,7 @@ class DateTimeTransformer implements DataTransformerInterface
      * @param  mixed
      * @return mixed
      */
-    public function transform($value)
+    public function transform($value, &$row)
     {
         if (!($value instanceof \DateTime)) {
             return $value;

@@ -22,9 +22,9 @@ class CallbackDataTransformer implements DataTransformerInterface
      * @param  mixed
      * @return mixed
      */
-    public function transform($value)
+    public function transform($value, &$row)
     {
         $callback = $this->callback;
-        return $callback($value);
+        return $callback($value, $row);
     }
 }

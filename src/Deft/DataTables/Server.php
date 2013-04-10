@@ -88,7 +88,7 @@ class Server implements ServerInterface
     protected function applyDataTransformers(array &$row)
     {
         foreach ($this->dataTransformers as $column => $dataTransformer) {
-            $row[$column] = $dataTransformer->transform($row[$column]);
+            $row[$column] = $dataTransformer->transform($row[$column], $row);
         }
 
         return $row;
