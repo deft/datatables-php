@@ -60,7 +60,7 @@ class ArrayDataSource implements DataSourceInterface
             function ($row) use ($request) {
                 $filterResults = [];
                 array_walk($request->columnFilters, function ($filter, $column) use ($row, &$filterResults) {
-                    $filterResults[] = false !== strpos($row[$column], $filter);
+                    $filterResults[] = false !== strpos(strtolower($row[$column]), strtolower($filter));
                 });
 
                 return !in_array(false, $filterResults);
