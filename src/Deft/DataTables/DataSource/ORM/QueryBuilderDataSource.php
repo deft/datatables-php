@@ -61,10 +61,23 @@ class QueryBuilderDataSource implements DataSourceInterface
                 $fieldName = $this->retrieveExpressionByFieldName($fieldName);
             }
 
+            // Treat '|' as OR
+            if (false !== strpos($filter, '|')) {
+                $possibleValues = explode('|', $filter);
+                $orX = [];
+                foreach ($possibleValues as $value)
+                {
+                    $paramName = ':datatables_' . $this->qb->getParameters()->count();
+                    $this->qb->setParameter($paramName, $value);
+                    $orX[] = $this->qb->expr()->eq($fieldName, $paramName);
+                }
 
-            $paramName = ':datatables_' . count($where);
-            $where[] = $this->qb->expr()->like($fieldName, $paramName);
-            $this->qb->setParameter($paramName, "%$filter%");
+                $where[] = call_user_func_array([$this->qb->expr(), 'orX'], $orX);
+            } else {
+                $paramName = ':datatables_' . $this->qb->getParameters()->count();
+                $this->qb->setParameter($paramName, "%$filter%");
+                $where[] = $this->qb->expr()->like($fieldName, $paramName);
+            }
         }
 
         if (count($where) > 0) {
