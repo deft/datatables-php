@@ -61,7 +61,7 @@ class QueryBuilderDataSource implements DataSourceInterface
                 $fieldName = $this->retrieveExpressionByFieldName($fieldName);
             }
 
-            // Treat '|' as OR
+            // Treat '|' as OR and '~' for date ranges
             if (false !== strpos($filter, '|')) {
                 $possibleValues = explode('|', $filter);
                 $orX = [];
@@ -73,6 +73,15 @@ class QueryBuilderDataSource implements DataSourceInterface
                 }
 
                 $where[] = call_user_func_array([$this->qb->expr(), 'orX'], $orX);
+            } elseif(preg_match('/^(\d{2})-(\d{2})-(\d{4})~(\d{2})-(\d{2})-(\d{4})$/', $filter)) {
+                $dates = explode('~', $filter);
+                $paramName = ':datatables_' . $this->qb->getParameters()->count();
+                $this->qb->setParameter($paramName, $dates[0]);
+                $where[] = $this->qb->expr()->lte($fieldName, $paramName);
+
+                $paramName = ':datatables_' . $this->qb->getParameters()->count();
+                $this->qb->setParameter($paramName, $dates[1]);
+                $where[] = $this->qb->expr()->gte($fieldName, $paramName);
             } else {
                 $paramName = ':datatables_' . $this->qb->getParameters()->count();
                 $this->qb->setParameter($paramName, "%$filter%");
