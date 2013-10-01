@@ -76,13 +76,14 @@ class QueryBuilderDataSource implements DataSourceInterface
             } elseif(preg_match('/^(\d{2})-(\d{2})-(\d{4})~(\d{2})-(\d{2})-(\d{4})$/', $filter)) {
                 $dates = explode('~', $filter);
                 $paramName = ':datatables_' . $this->qb->getParameters()->count();
-                $this->qb->setParameter($paramName, $dates[0]);
-                $where[] = $this->qb->expr()->lte($fieldName, $paramName);
+                $this->qb->setParameter($paramName, \DateTime::createFromFormat('d-m-Y', $dates[0]));
+                $where[] = $this->qb->expr()->gte($fieldName, $paramName);
 
                 $paramName = ':datatables_' . $this->qb->getParameters()->count();
-                $this->qb->setParameter($paramName, $dates[1]);
-                $where[] = $this->qb->expr()->gte($fieldName, $paramName);
+                $this->qb->setParameter($paramName, \DateTime::createFromFormat('d-m-Y', $dates[1]));
+                $where[] = $this->qb->expr()->lte($fieldName, $paramName);
             } else {
+                if (false !== strpos($filter, '~')) { continue; }
                 $paramName = ':datatables_' . $this->qb->getParameters()->count();
                 $this->qb->setParameter($paramName, "%$filter%");
                 $where[] = $this->qb->expr()->like($fieldName, $paramName);
