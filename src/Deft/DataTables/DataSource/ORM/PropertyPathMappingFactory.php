@@ -27,8 +27,12 @@ class PropertyPathMappingFactory
             }
 
             $fieldParts = explode('.', $field);
-            $alias = $fieldParts[0];
-            $mapping[$key] = trim($aliasMapping[$fieldParts[0]] . '.' . $fieldParts[1], '.');
+            if (isset($fieldParts[1])) {
+                $alias = $fieldParts[0];
+                $mapping[$key] = trim($aliasMapping[$fieldParts[0]] . '.' . $fieldParts[1], '.');
+            } else {
+                $mapping[$key] = trim($fieldParts[0]);
+            }
         }
 
         return $mapping;
