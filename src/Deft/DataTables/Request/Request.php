@@ -35,14 +35,14 @@ class Request
     /**
      * List of column-specific filters, key being the column name
      *
-     * @var string
+     * @var array
      */
     public $columnFilters = [];
 
     /**
      * Ordered list of key (column) / value (direction) pairs
      *
-     * @var string
+     * @var array
      */
     public $columnSorts = [];
 }
